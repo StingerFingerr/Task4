@@ -1,0 +1,88 @@
+﻿@model IEnumerable<Task4.Models.UserModel>
+
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+
+
+
+
+<form method="post">
+    <div class="nl">
+        <table class="table table-striped table-bordered ">
+            <tbody class="table-responsive ">
+                <tr>
+                    <th><input type="checkbox" class="all" data-id="d1" title="Select all"></th>
+                    <th>Login</th>
+                    <th>Password</th>
+                    <th>Register date</th>
+                    <th>Date Last Login</th>
+                    <th>Is blocked</th>
+                </tr>
+
+                @foreach (var user in Model)
+                {
+                    <tr>
+                        <td>
+                            <input type="checkbox" id="@user.ID" value="@user.ID" name="id" class="one" data-id="d1">
+                        </td>
+                        <td>@user.Email</td>
+                        <td>@user.Password</td>
+                        <td>@user.RegisterDate</td>
+                        <td>@user.LastLoginDate</td>
+                        <td>@user.isBlocked</td>
+                    </tr>
+                }
+            </tbody>
+
+        </table>
+    </div>
+    <input type="submit" value="block" asp-action="Block" />
+    <input type="submit" value="unblock" asp-action="Unblock" />
+    <input type="submit" value="delete" asp-action="Delete" />
+</form>
+
+
+@*Выбрать всё*@
+<script type="text/javascript">
+    $(document).ready(function () {
+        $(".all").on("change", function () {
+            var groupId = $(this).data('id');
+            $('.one[data-id="' + groupId + '"]').prop("checked", this.checked);
+        });
+
+        $(".one").on("change", function () {
+            var groupId = $(this).data('id');
+            var allChecked = $('.one[data-id="' + groupId + '"]:not(:checked)').length == 0;
+            $('.all[data-id="' + groupId + '"]').prop("checked", allChecked);
+        });
+    });
+</script>
+@*Только отмеченные*@
+<script type="text/javascript">
+
+        function SelectedCheckbox() {
+            var checkedArray = new Array();
+            $("input[name='checkbox']:checked")
+                .each(function () {
+                    checkedArray.push($(this).val());
+                });
+            alert(checkedArray);
+
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("Block", "Account")',
+                dataType: "json",
+                data: { 'selectedItems': checkedArray },
+                success: function (data) {
+                    alert('Success');
+                },
+                error: function (data) {
+                    alert('fail');
+                }
+            });
+            return;
+        }
+</script>
